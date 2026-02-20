@@ -155,8 +155,10 @@ MonoBehaviour:
   _startVelocityMin: 5
   _startVelocityMax: 10
   _cohesionMultiplier: 0.01
-  _separationMultiplier: 0.01
+  _separationDistance: 5
+  _separationMultiplier: 0.1
   _alignmentMultiplier: 0.01
+  _velocityMax: 20
 --- !u!4 &466527452
 Transform:
   m_ObjectHideFlags: 0

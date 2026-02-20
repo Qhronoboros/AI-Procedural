@@ -18,6 +18,7 @@ public class Boids : MonoBehaviour
 
     [Header("Rule Values")]
     [SerializeField] private float _cohesionMultiplier = 0.01f;
+    [SerializeField] private float _separationDistance = 5.0f;
     [SerializeField] private float _separationMultiplier = 0.01f;
     [SerializeField] private float _alignmentMultiplier = 0.01f;
 
@@ -123,7 +124,7 @@ public class Boids : MonoBehaviour
         {
             if (boid.gameObject != currentBoid.gameObject)
             {
-                if (Vector3.Distance(boid.position, currentBoid.position) < 10.0f)
+                if (Vector3.Distance(boid.position, currentBoid.position) < _separationDistance)
                 {
                     velocity -= boid.position - currentBoid.position;
                 }
