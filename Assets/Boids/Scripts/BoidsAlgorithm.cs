@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Boids : MonoBehaviour
 {
@@ -14,6 +15,13 @@ public class Boids : MonoBehaviour
 
     [SerializeField] private float _startVelocityMin = 5.0f;
     [SerializeField] private float _startVelocityMax = 10.0f;
+
+    [Header("Rule Values")]
+    [SerializeField] private float _cohesionMultiplier = 0.01f;
+    [SerializeField] private float _separationMultiplier = 0.01f;
+    [SerializeField] private float _alignmentMultiplier = 0.01f;
+
+    [SerializeField] private float _velocityMax = 20.0f;
 
     private List<Boid> _boids = new List<Boid>();
 
@@ -80,6 +88,10 @@ public class Boids : MonoBehaviour
 
             // Add velocities together
             boid.velocity += v1 + v2 + v3 + v4;
+
+            // Limit Velocity
+            LimitVelocity(boid);
+
             // Change position using new velocity
             boid.position += boid.velocity * Time.deltaTime;
             boid.gameObject.transform.position = boid.position;
@@ -100,7 +112,7 @@ public class Boids : MonoBehaviour
 
         Vector3 positionMean = positionSum / Mathf.Max(_boids.Count - 1, 1);
 
-        return (positionMean - currentBoid.position) / 100.0f;
+        return (positionMean - currentBoid.position) * _cohesionMultiplier;
     }
 
     private Vector3 Separation(Boid currentBoid)
@@ -118,7 +130,7 @@ public class Boids : MonoBehaviour
             }
         }
 
-        return velocity / 100.0f;
+        return velocity * _separationMultiplier;
     }
 
     private Vector3 Alignment(Boid currentBoid)
@@ -135,38 +147,46 @@ public class Boids : MonoBehaviour
 
         Vector3 velocityMean = velocity / Mathf.Max(_boids.Count - 1, 1);
 
-        return (velocityMean - currentBoid.velocity) / 8.0f;
+        return (velocityMean - currentBoid.velocity) * _alignmentMultiplier;
+    }
+
+    private void LimitVelocity(Boid currentBoid)
+    {
+        if (currentBoid.velocity.magnitude > _velocityMax)
+        {
+            currentBoid.velocity = currentBoid.velocity / Mathf.Max(currentBoid.velocity.magnitude, 0.00001f) * _velocityMax;
+        }
     }
 
     private Vector3 BoundPosition(Boid currentBoid)
     {
         Vector3 velocity = Vector3.zero;
 
-        if (currentBoid.position.x < -100.0f)
+        if (currentBoid.position.x < -40.0f)
         {
-            velocity.x = 5;
+            velocity.x = 1;
         }
-        else if (currentBoid.position.x > 100.0f)
+        else if (currentBoid.position.x > 40.0f)
         {
-            velocity.x = -5;
-        }
-
-        if (currentBoid.position.y < -100.0f)
-        {
-            velocity.y = 5;
-        }
-        else if (currentBoid.position.y > 100.0f)
-        {
-            velocity.y = -5;
+            velocity.x = -1;
         }
 
-        if (currentBoid.position.z < -100.0f)
+        if (currentBoid.position.y < -20.0f)
         {
-            velocity.z = 5;
+            velocity.y = 1;
         }
-        else if (currentBoid.position.z > 100.0f)
+        else if (currentBoid.position.y > 20.0f)
         {
-            velocity.z = -5;
+            velocity.y = -1;
+        }
+
+        if (currentBoid.position.z < -20.0f)
+        {
+            velocity.z = 1;
+        }
+        else if (currentBoid.position.z > 20.0f)
+        {
+            velocity.z = -1;
         }
 
         return velocity;
