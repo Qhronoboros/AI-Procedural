@@ -75,8 +75,6 @@ public class Boids : MonoBehaviour
         {
             Boid boid = _boids[i];
 
-            print(boid.velocity);
-
             // Cohesion
             v1 = Cohesion(boid);
             // Separation
