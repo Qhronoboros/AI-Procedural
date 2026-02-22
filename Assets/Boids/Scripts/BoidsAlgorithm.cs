@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class Boids : MonoBehaviour
 {
+    [SerializeField] private ComputeShader computeShader;
+
     [SerializeField] private GameObject boidPrefab;
 
     [Header("Start Values")]
@@ -24,11 +24,24 @@ public class Boids : MonoBehaviour
 
     [SerializeField] private float _velocityMax = 20.0f;
 
-    private List<Boid> _boids = new List<Boid>();
+    private List<BoidClass> _boids = new List<BoidClass>();
+    private Boid[] boids;
 
-    class Boid
+    public struct Boid
     {
-        public Boid(GameObject gameObject, Vector3 position, Vector3 velocity)
+        public Boid(Vector3 position, Vector3 velocity)
+        {
+            this.position = position;
+            this.velocity = velocity;
+        }
+
+        public Vector3 position;
+        public Vector3 velocity;
+    }   
+
+    class BoidClass
+    {
+        public BoidClass(GameObject gameObject, Vector3 position, Vector3 velocity)
         {
             this.gameObject = gameObject;
             this.position = position;
@@ -50,18 +63,58 @@ public class Boids : MonoBehaviour
 
     private void Start()
     {
+        boids = new Boid[boidStartAmount];
+    
         for (int i = 0; i < boidStartAmount; i++)
         {
             // Set positions and velocity
             Vector3 randomPosition = GetRandomPointInsideSphere(_startDistanceMin, _startDistanceMax);
             Vector3 randomVelocity = GetRandomPointInsideSphere(_startVelocityMin, _startVelocityMax);
 
-            _boids.Add(new Boid(Instantiate(boidPrefab, randomPosition, Quaternion.identity), randomPosition, randomVelocity));
+            _boids.Add(new BoidClass(Instantiate(boidPrefab, randomPosition, Quaternion.identity), randomPosition, randomVelocity));
+
+
+            boids[i] = new Boid(randomPosition, randomVelocity);
         }
+    }
+
+    private void ComputeBoids()
+    {
+        int kernel = computeShader.FindKernel("CSMain");
+    
+        ComputeBuffer boidsBuffer = new ComputeBuffer(boids.Length, sizeof(float) * 6);
+        boidsBuffer.SetData(boids);
+        
+        computeShader.SetBuffer(kernel, "boids", boidsBuffer);
+        
+        computeShader.SetFloat("cohesionMultiplier", _cohesionMultiplier);
+        
+        computeShader.SetFloat("separationDistance", _separationDistance);
+        computeShader.SetFloat("separationMultiplier", _separationMultiplier);
+        
+        computeShader.SetFloat("alignmentMultiplier", _alignmentMultiplier);
+        
+        computeShader.SetFloat("velocityMax", _velocityMax);
+        
+        computeShader.Dispatch(kernel, boids.Length / 8, 1, 1);
+        
+        boidsBuffer.GetData(boids);
+        
+        for (int i = 0; i < boids.Length; i++)
+        {
+            _boids[i].gameObject.transform.position = boids[i].position;
+        }
+    }
+
+    private void Update()
+    {
+        ComputeBoids();
     }
 
     private void FixedUpdate()
     {
+        return;
+        
         Vector3 v1, v2, v3, v4;
         int boidsCount = _boids.Count;
 
@@ -72,8 +125,8 @@ public class Boids : MonoBehaviour
         // }
 
         for (int i = 0; i < boidsCount; i++)
-        {
-            Boid boid = _boids[i];
+        {  
+            BoidClass boid = _boids[i];
 
             // Cohesion
             v1 = Cohesion(boid);
@@ -97,11 +150,11 @@ public class Boids : MonoBehaviour
         }
     }
 
-    private Vector3 Cohesion(Boid currentBoid)
+    private Vector3 Cohesion(BoidClass currentBoid)
     {
         Vector3 positionSum = Vector3.zero;
 
-        foreach(Boid boid in _boids)
+        foreach(BoidClass boid in _boids)
         {
             if (boid.gameObject != currentBoid.gameObject)
             {
@@ -114,11 +167,11 @@ public class Boids : MonoBehaviour
         return (positionMean - currentBoid.position) * _cohesionMultiplier;
     }
 
-    private Vector3 Separation(Boid currentBoid)
+    private Vector3 Separation(BoidClass currentBoid)
     {
         Vector3 velocity = Vector3.zero;
 
-        foreach(Boid boid in _boids)
+        foreach(BoidClass boid in _boids)
         {
             if (boid.gameObject != currentBoid.gameObject)
             {
@@ -132,11 +185,11 @@ public class Boids : MonoBehaviour
         return velocity * _separationMultiplier;
     }
 
-    private Vector3 Alignment(Boid currentBoid)
+    private Vector3 Alignment(BoidClass currentBoid)
     {
         Vector3 velocity = Vector3.zero;
 
-        foreach(Boid boid in _boids)
+        foreach(BoidClass boid in _boids)
         {
             if (boid.gameObject != currentBoid.gameObject)
             {
@@ -149,7 +202,7 @@ public class Boids : MonoBehaviour
         return (velocityMean - currentBoid.velocity) * _alignmentMultiplier;
     }
 
-    private void LimitVelocity(Boid currentBoid)
+    private void LimitVelocity(BoidClass currentBoid)
     {
         if (currentBoid.velocity.magnitude > _velocityMax)
         {
@@ -157,7 +210,7 @@ public class Boids : MonoBehaviour
         }
     }
 
-    private Vector3 BoundPosition(Boid currentBoid)
+    private Vector3 BoundPosition(BoidClass currentBoid)
     {
         Vector3 velocity = Vector3.zero;
 

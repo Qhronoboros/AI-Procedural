@@ -148,7 +148,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57f0c103239cdaa4f93bdab877ce03e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Boids
-  computeShader: {fileID: 7200000, guid: bf74ea00bc457ef4287a26ee1ed52b45, type: 3}
   boidPrefab: {fileID: 215015432315461797, guid: ed1cf71f6ddbd2e4aa3ccfa280ac7a1b, type: 3}
   boidStartAmount: 200
   _startDistanceMin: 0

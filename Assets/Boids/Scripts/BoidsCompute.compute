@@ -1,22 +1,157 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
 
-// Create a RenderTexture with enableRandomWrite flag and set it
-// with cs.SetTexture
-RWTexture2D<float4> Result;
-
-public struct Boid
+struct Boid
 {
-    public Vector3 position
-    public vector3 velocity
-}
+    float3 position;
+    float3 velocity;
+};
 
 RWStructuredBuffer<Boid> boids;
 
-[numthreads(8,8,1)]
+float cohesionMultiplier;
+
+float separationMultiplier;
+float separationDistance;
+
+float alignmentMultiplier;
+
+float velocityMax;
+
+[numthreads(8,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    // TODO: insert actual code here!
+    Boid currentBoid = boids[id.x];
+    
+    uint length, stride;
 
-    Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+    boids.GetDimensions(length, stride);
+
+    float3 positionSum;
+
+    for (int i = 0; i < (int)length; i++)
+    {
+        Boid boid = boids[i];
+        if (boid.position != currentBoid.position)
+        {
+            positionSum += boids[i].position;
+        }
+    }
+
+    float3 positionMean = positionSum / max(boids.length - 1, 1);
+
+    float3 result = (positionMean - currentBoid.position) * cohesionMultiplier;
+
+    // Cohesion
+    float3 v1 = Cohesion(currentBoid);
+    // Separation
+    float3 v2 = Separation(currentBoid);
+    // Alignment
+    float3 v3 = Alignment(currentBoid);
+
+    // Bound Position
+    float3 v4 = BoundPosition(currentBoid);
+
+    // Add velocities together
+    currentBoid.velocity += v1 + v2 + v3 + v4;
+
+    // Limit Velocity
+    LimitVelocity(currentBoid);
+
+    // Change position using new velocity
+    currentBoid.position += currentBoid.velocity * unity_DeltaTime;
 }
+
+// float3 Cohesion(Boid currentBoid)
+// {
+//     float3 positionSum = float3.Zero;
+
+//     for (int i = 0; i < boids.length; i++)
+//     {
+//         if (boids[i] != currentBoid)
+//         {
+//             positionSum += boids[i].position;
+//         }
+//     }
+
+//     float3 positionMean = positionSum / max(boids.length - 1, 1);
+
+//     return (positionMean - currentBoid.position) * cohesionMultiplier;
+// }
+
+// float3 Separation(Boid currentBoid)
+// {
+//     float3 velocity = float3.Zero;
+
+//     for (int i = 0; i < boids.length; i++)
+//     {
+//         if (boids[i] != currentBoid)
+//         {
+//             if (distance(boids[i].position, currentBoid.position) < separationDistance)
+//             {
+//                 velocity -= boids[i].position - currentBoid.position;
+//             }
+//         }
+//     }
+
+//     return velocity * separationMultiplier;
+// }
+
+// float3 Alignment(Boid currentBoid)
+// {
+//     float3 velocity = float3.Zero;
+
+//     for (int i = 0; i < boids.length; i++)
+//     {
+//         if (boids[i] != currentBoid)
+//         {
+//             velocity += boid.velocity;
+//         }
+//     }
+
+//     float3 velocityMean = velocity / max(boids.length - 1, 1);
+
+//     return (velocityMean - currentBoid.velocity) * alignmentMultiplier;
+// }
+
+// void LimitVelocity(Boid currentBoid)
+// {
+//     if (currentBoid.velocity.length > velocityMax)
+//     {
+//         currentBoid.velocity = currentBoid.velocity / max(currentBoid.velocity.magnitude, 0.00001f) * velocityMax;
+//     }
+// }
+
+// float3 BoundPosition(Boid currentBoid)
+// {
+//     float3 velocity = float3.Zero;
+
+//     if (currentBoid.position.x < -40.0f)
+//     {
+//         velocity.x = 1;
+//     }
+//     else if (currentBoid.position.x > 40.0f)
+//     {
+//         velocity.x = -1;
+//     }
+
+//     if (currentBoid.position.y < -20.0f)
+//     {
+//         velocity.y = 1;
+//     }
+//     else if (currentBoid.position.y > 20.0f)
+//     {
+//         velocity.y = -1;
+//     }
+
+//     if (currentBoid.position.z < -20.0f)
+//     {
+//         velocity.z = 1;
+//     }
+//     else if (currentBoid.position.z > 20.0f)
+//     {
+//         velocity.z = -1;
+//     }
+
+//     return velocity;
+// }
