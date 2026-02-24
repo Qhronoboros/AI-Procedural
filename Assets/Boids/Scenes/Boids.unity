@@ -148,9 +148,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57f0c103239cdaa4f93bdab877ce03e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Boids
+  _useComputeShader: 1
   computeShader: {fileID: 7200000, guid: bf74ea00bc457ef4287a26ee1ed52b45, type: 3}
   boidPrefab: {fileID: 215015432315461797, guid: ed1cf71f6ddbd2e4aa3ccfa280ac7a1b, type: 3}
-  boidStartAmount: 200
+  predatorPrefab: {fileID: 2069986796022604313, guid: 9b35553e3fb76fa4bb98aed0a87a7157, type: 3}
+  boidStartAmount: 10000
   _startDistanceMin: 0
   _startDistanceMax: 20
   _startVelocityMin: 5
@@ -160,6 +162,13 @@ MonoBehaviour:
   _separationMultiplier: 0.1
   _alignmentMultiplier: 0.01
   _velocityMax: 20
+  _leftBounds: 40
+  _rightBounds: 40
+  _topBounds: 20
+  _bottomBounds: 20
+  _frontBounds: 20
+  _backBounds: 20
+  _boundsMultiplier: 1
 --- !u!4 &466527452
 Transform:
   m_ObjectHideFlags: 0

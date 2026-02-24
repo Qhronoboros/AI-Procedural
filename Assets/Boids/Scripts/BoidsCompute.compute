@@ -18,109 +18,118 @@ float alignmentMultiplier;
 
 float velocityMax;
 
+float leftBounds;
+float rightBounds;
+float topBounds;
+float bottomBounds;
+float frontBounds;
+float backBounds;
+float boundsMultiplier;
+
+float deltaTime;
+
 [numthreads(8,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     Boid currentBoid = boids[id.x];
     
-    uint length, stride;
+    uint arrayLength, stride;
 
-    boids.GetDimensions(length, stride);
+    boids.GetDimensions(arrayLength, stride);
+    int lengthExclude = max(arrayLength - 1, 1);
 
+
+    // Cohesion
     float3 positionSum;
 
-    for (int i = 0; i < (int)length; i++)
+    for (uint i = 0; i < arrayLength; i++)
     {
-        Boid boid = boids[i];
-        if (boid.position != currentBoid.position)
+        if (i != id.x)
         {
             positionSum += boids[i].position;
         }
     }
 
-    float3 positionMean = positionSum / max(boids.length - 1, 1);
+    float3 positionMean = positionSum / lengthExclude;
 
-    float3 result = (positionMean - currentBoid.position) * cohesionMultiplier;
+    float3 v1 = (positionMean - currentBoid.position) * cohesionMultiplier;
 
-    // Cohesion
-    float3 v1 = Cohesion(currentBoid);
     // Separation
-    float3 v2 = Separation(currentBoid);
+    float3 separationVelocity;
+
+    for (uint j = 0; j < arrayLength; j++)
+    {
+        if (j != id.x && distance(boids[j].position, currentBoid.position) < separationDistance)
+        {
+            separationVelocity -= boids[j].position - currentBoid.position;
+        }
+    }
+
+    float3 v2 = separationVelocity * separationMultiplier;
+
     // Alignment
-    float3 v3 = Alignment(currentBoid);
+    float3 alignmentVelocity = 0;
+
+    for (uint k = 0; k < arrayLength; k++)
+    {
+        if (k != id.x)
+        {
+            alignmentVelocity += boids[k].velocity;
+        }
+    }
+
+    float3 velocityMean = alignmentVelocity / lengthExclude;
+
+    float3 v3 = (velocityMean - currentBoid.velocity) * alignmentMultiplier;
 
     // Bound Position
-    float3 v4 = BoundPosition(currentBoid);
+    float3 boundVelocity;
+
+    if (currentBoid.position.x < -leftBounds)
+    {
+        boundVelocity.x = boundsMultiplier;
+    }
+    else if (currentBoid.position.x > rightBounds)
+    {
+        boundVelocity.x = -boundsMultiplier;
+    }
+
+    if (currentBoid.position.y < -bottomBounds)
+    {
+        boundVelocity.y = boundsMultiplier;
+    }
+    else if (currentBoid.position.y > topBounds)
+    {
+        boundVelocity.y = -boundsMultiplier;
+    }
+
+    if (currentBoid.position.z < -backBounds)
+    {
+        boundVelocity.z = boundsMultiplier;
+    }
+    else if (currentBoid.position.z > topBounds)
+    {
+        boundVelocity.z = -boundsMultiplier;
+    }
+
+    float3 v4 = boundVelocity;
 
     // Add velocities together
     currentBoid.velocity += v1 + v2 + v3 + v4;
 
+    float magnitude = length(currentBoid.velocity);
+
     // Limit Velocity
-    LimitVelocity(currentBoid);
+    if (magnitude > velocityMax)
+    {
+        currentBoid.velocity = currentBoid.velocity / max(magnitude * velocityMax, 0.00001f);
+    }
 
     // Change position using new velocity
-    currentBoid.position += currentBoid.velocity * unity_DeltaTime;
+    currentBoid.position += currentBoid.velocity * deltaTime;
+
+    boids[id.x] = currentBoid;
 }
-
-// float3 Cohesion(Boid currentBoid)
-// {
-//     float3 positionSum = float3.Zero;
-
-//     for (int i = 0; i < boids.length; i++)
-//     {
-//         if (boids[i] != currentBoid)
-//         {
-//             positionSum += boids[i].position;
-//         }
-//     }
-
-//     float3 positionMean = positionSum / max(boids.length - 1, 1);
-
-//     return (positionMean - currentBoid.position) * cohesionMultiplier;
-// }
-
-// float3 Separation(Boid currentBoid)
-// {
-//     float3 velocity = float3.Zero;
-
-//     for (int i = 0; i < boids.length; i++)
-//     {
-//         if (boids[i] != currentBoid)
-//         {
-//             if (distance(boids[i].position, currentBoid.position) < separationDistance)
-//             {
-//                 velocity -= boids[i].position - currentBoid.position;
-//             }
-//         }
-//     }
-
-//     return velocity * separationMultiplier;
-// }
-
-// float3 Alignment(Boid currentBoid)
-// {
-//     float3 velocity = float3.Zero;
-
-//     for (int i = 0; i < boids.length; i++)
-//     {
-//         if (boids[i] != currentBoid)
-//         {
-//             velocity += boid.velocity;
-//         }
-//     }
-
-//     float3 velocityMean = velocity / max(boids.length - 1, 1);
-
-//     return (velocityMean - currentBoid.velocity) * alignmentMultiplier;
-// }
-
-// void LimitVelocity(Boid currentBoid)
-// {
-//     if (currentBoid.velocity.length > velocityMax)
-//     {
-//         currentBoid.velocity = currentBoid.velocity / max(currentBoid.velocity.magnitude, 0.00001f) * velocityMax;
-//     }
-// }
 
 // float3 BoundPosition(Boid currentBoid)
 // {

@@ -3,9 +3,12 @@ using UnityEngine;
 
 public class Boids : MonoBehaviour
 {
+    [SerializeField] private bool _useComputeShader;
+
     [SerializeField] private ComputeShader computeShader;
 
     [SerializeField] private GameObject boidPrefab;
+    [SerializeField] private GameObject predatorPrefab;
 
     [Header("Start Values")]
     [SerializeField] private int boidStartAmount = 20;
@@ -24,8 +27,18 @@ public class Boids : MonoBehaviour
 
     [SerializeField] private float _velocityMax = 20.0f;
 
+    [Header("Bounds")]
+    [SerializeField] private float _leftBounds = 40.0f;
+    [SerializeField] private float _rightBounds = 40.0f;
+    [SerializeField] private float _topBounds = 20.0f;
+    [SerializeField] private float _bottomBounds = 20.0f;
+    [SerializeField] private float _frontBounds = 20.0f;
+    [SerializeField] private float _backBounds = 20.0f;
+    [SerializeField] private float _boundsMultiplier = 1.0f;
+
+
     private List<BoidClass> _boids = new List<BoidClass>();
-    private Boid[] boids;
+    private Boid[] computeBoids;
 
     public struct Boid
     {
@@ -63,7 +76,7 @@ public class Boids : MonoBehaviour
 
     private void Start()
     {
-        boids = new Boid[boidStartAmount];
+        computeBoids = new Boid[boidStartAmount];
     
         for (int i = 0; i < boidStartAmount; i++)
         {
@@ -71,10 +84,8 @@ public class Boids : MonoBehaviour
             Vector3 randomPosition = GetRandomPointInsideSphere(_startDistanceMin, _startDistanceMax);
             Vector3 randomVelocity = GetRandomPointInsideSphere(_startVelocityMin, _startVelocityMax);
 
+            computeBoids[i] = new Boid(randomPosition, randomVelocity);
             _boids.Add(new BoidClass(Instantiate(boidPrefab, randomPosition, Quaternion.identity), randomPosition, randomVelocity));
-
-
-            boids[i] = new Boid(randomPosition, randomVelocity);
         }
     }
 
@@ -82,8 +93,8 @@ public class Boids : MonoBehaviour
     {
         int kernel = computeShader.FindKernel("CSMain");
     
-        ComputeBuffer boidsBuffer = new ComputeBuffer(boids.Length, sizeof(float) * 6);
-        boidsBuffer.SetData(boids);
+        ComputeBuffer boidsBuffer = new ComputeBuffer(computeBoids.Length, sizeof(float) * 6);
+        boidsBuffer.SetData(computeBoids);
         
         computeShader.SetBuffer(kernel, "boids", boidsBuffer);
         
@@ -96,25 +107,40 @@ public class Boids : MonoBehaviour
         
         computeShader.SetFloat("velocityMax", _velocityMax);
         
-        computeShader.Dispatch(kernel, boids.Length / 8, 1, 1);
+        computeShader.SetFloat("leftBounds", _leftBounds);
+        computeShader.SetFloat("rightBounds", _rightBounds);
+        computeShader.SetFloat("topBounds", _topBounds);
+        computeShader.SetFloat("bottomBounds", _bottomBounds);
+        computeShader.SetFloat("frontBounds", _frontBounds);
+        computeShader.SetFloat("backBounds", _backBounds);
+        computeShader.SetFloat("boundsMultiplier", _boundsMultiplier);
         
-        boidsBuffer.GetData(boids);
+        computeShader.SetFloat("deltaTime", Time.deltaTime);
         
-        for (int i = 0; i < boids.Length; i++)
+        computeShader.Dispatch(kernel, computeBoids.Length / 8, 1, 1);
+        
+        boidsBuffer.GetData(computeBoids);
+        
+        for (int i = 0; i < computeBoids.Length; i++)
         {
-            _boids[i].gameObject.transform.position = boids[i].position;
+            _boids[i].gameObject.transform.position = computeBoids[i].position;
         }
     }
 
     private void Update()
     {
-        ComputeBoids();
+        if (_useComputeShader)
+        {
+            ComputeBoids();
+        }
+        else
+        {
+            CalculateBoids();
+        }
     }
 
-    private void FixedUpdate()
+    private void CalculateBoids()
     {
-        return;
-        
         Vector3 v1, v2, v3, v4;
         int boidsCount = _boids.Count;
 
@@ -206,7 +232,7 @@ public class Boids : MonoBehaviour
     {
         if (currentBoid.velocity.magnitude > _velocityMax)
         {
-            currentBoid.velocity = currentBoid.velocity / Mathf.Max(currentBoid.velocity.magnitude, 0.00001f) * _velocityMax;
+            currentBoid.velocity = currentBoid.velocity / Mathf.Max(currentBoid.velocity.magnitude * _velocityMax, 0.00001f);
         }
     }
 
