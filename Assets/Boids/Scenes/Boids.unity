@@ -156,7 +156,7 @@ MonoBehaviour:
   _startDistanceMax: 20
   _startVelocityMin: 5
   _startVelocityMax: 10
-  _cohesionMultiplier: 0.05
+  _cohesionMultiplier: 0.025
   _separationDistance: 5
   _separationMultiplier: 0.25
   _alignmentMultiplier: 0.01
