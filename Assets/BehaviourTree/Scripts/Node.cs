@@ -1,16 +1,34 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class Node : MonoBehaviour
+public class Node
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public enum Status
     {
-        
+        Success,
+        Failure,
+        Running
     }
 
-    // Update is called once per frame
-    void Update()
+    public string name;
+    public List<Node> children = new();
+    protected int currentChild;
+
+    public Node(string name = "Node")
     {
-        
+        this.name = name;
+    }
+    
+    public void AddChild(Node child) => children.Add(child);
+    
+    public virtual Status Process() => children[currentChild].Process();
+    
+    public virtual void Reset()
+    {
+        currentChild = 0;
+        foreach (Node child in children)
+        {
+            child.Reset();
+        }
     }
 }
