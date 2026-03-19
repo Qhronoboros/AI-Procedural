@@ -453,7 +453,7 @@ PrefabInstance:
       objectReference: {fileID: 1721544561}
     - target: {fileID: 4391925865117950842, guid: 6c9f676ea4f87cf439c85a033fef9465, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.1
+      value: -4.1842027
       objectReference: {fileID: 0}
     - target: {fileID: 4391925865117950842, guid: 6c9f676ea4f87cf439c85a033fef9465, type: 3}
       propertyPath: m_LocalPosition.y
@@ -461,7 +461,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4391925865117950842, guid: 6c9f676ea4f87cf439c85a033fef9465, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 7.41
+      value: -4.560197
       objectReference: {fileID: 0}
     - target: {fileID: 4391925865117950842, guid: 6c9f676ea4f87cf439c85a033fef9465, type: 3}
       propertyPath: m_LocalRotation.w
@@ -494,10 +494,6 @@ PrefabInstance:
     - target: {fileID: 6987419936520146479, guid: 6c9f676ea4f87cf439c85a033fef9465, type: 3}
       propertyPath: m_Name
       value: Guard
-      objectReference: {fileID: 0}
-    - target: {fileID: 7468683801224814059, guid: 6c9f676ea4f87cf439c85a033fef9465, type: 3}
-      propertyPath: m_Speed
-      value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2051,6 +2047,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1160336720941774780, guid: 04c3ba1d1c415ee4b83bbdf3c3a881bf, type: 3}
+      propertyPath: m_LinearDamping
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 2367059733559994707, guid: 04c3ba1d1c415ee4b83bbdf3c3a881bf, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.32442358

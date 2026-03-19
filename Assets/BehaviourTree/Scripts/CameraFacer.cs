@@ -4,7 +4,9 @@ public class CameraFacer : MonoBehaviour
 {
     private void FixedUpdate()
     {
-        if (Camera.current)
-            transform.rotation = Quaternion.LookRotation(transform.position - Camera.current.transform.position);    
+        if (Camera.main)
+        {
+            transform.rotation = Quaternion.LookRotation(transform.position - Camera.main.transform.position);
+        }
     }
 }

@@ -4,12 +4,12 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] private Transform _Camera;
-    [SerializeField] private float _rotationSpeed = 180f;
-    [SerializeField] private float _moveSpeed = 3;
+    [SerializeField] private float _rotationSpeed = 180.0f;
+    [SerializeField] private float _moveSpeed = 3.0f;
     private Rigidbody _rb;
     private Collider _mainCollider;
-    private float _inputVertical = 0;
-    private float _inputHorizontal = 0;
+    private float _inputVertical = 0.0f;
+    private float _inputHorizontal = 0.0f;
 
     private int _maxHealth = 10;
     private int _health;
@@ -34,6 +34,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         BlackboardManager.globalBlackboard.SetVariable(VariableNames.PLAYER_POSITION, transform.position);
+        BlackboardManager.globalBlackboard.SetVariable(VariableNames.PLAYER_DEAD, false);
     }
 
     private void FixedUpdate()
@@ -53,8 +54,15 @@ public class Player : MonoBehaviour
         BlackboardManager.globalBlackboard.SetVariable(VariableNames.PLAYER_POSITION, transform.position);
     }
 
-    private void TakeDamage(int damage)
+    public void TakeDamage(int damage)
     {
-        
+        _health = Mathf.Max(_health - damage, 0);
+
+        if (_health <= 0)
+        {
+            Debug.Log("Player Dead");
+            BlackboardManager.globalBlackboard.SetVariable(VariableNames.PLAYER_DEAD, true);
+            Destroy(gameObject);
+        }
     }
 }
