@@ -1,30 +1,29 @@
-// Source https://github.com/vmuijrers/GameDevAI
+// Source https://github.com/vmuijrers/GameDevAI/blob/main/BehaviourTreeExample/Assets/Scripts/Player/ThirdPersonCamera.cs
 using UnityEngine;
 
 public class ThirdPersonCamera : MonoBehaviour
 {
-    [SerializeField] private float rotXSpeed = 30f;
-    [SerializeField] private float rotYSpeed = 30f;
-    [SerializeField] private Transform followTarget;
+    [SerializeField] private float _rotXSpeed = 30f;
+    [SerializeField] private float _rotYSpeed = 30f;
+    [SerializeField] private Transform _followTarget;
 
-    private float angleX = 0;
-    private float angleY = 0;
-    // Start is called before the first frame update
+    private float _angleX = 0;
+    private float _angleY = 0;
+    
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
-        angleX += mouseX * Time.deltaTime * rotXSpeed;
-        angleY += mouseY * Time.deltaTime * rotYSpeed;
-        angleY = Mathf.Clamp(angleY, -85f, 85f);    
-        transform.position = followTarget.position;
-        transform.rotation = Quaternion.Euler(-angleY, angleX, 0);
+        _angleX += mouseX * Time.deltaTime * _rotXSpeed;
+        _angleY += mouseY * Time.deltaTime * _rotYSpeed;
+        _angleY = Mathf.Clamp(_angleY, -85f, 85f);    
+        transform.position = _followTarget.position;
+        transform.rotation = Quaternion.Euler(-_angleY, _angleX, 0);
     }
 }

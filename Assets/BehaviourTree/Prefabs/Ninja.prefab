@@ -59,5 +59,25 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3326709342041788154, guid: bd341193d32b0e147b8389c79409deb7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2079013675569762731}
   m_SourcePrefab: {fileID: 100100000, guid: bd341193d32b0e147b8389c79409deb7, type: 3}
+--- !u!1 &8994375023930754054 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3326709342041788154, guid: bd341193d32b0e147b8389c79409deb7, type: 3}
+  m_PrefabInstance: {fileID: 5978714233902598908}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2079013675569762731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8994375023930754054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a8b3a48fb53eec48aeda11b6a30332f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ninja

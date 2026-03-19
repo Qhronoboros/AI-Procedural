@@ -1,0 +1,52 @@
+// Source: https://github.com/adammyhre/Unity-Behaviour-Trees/blob/master/Assets/_Project/Scripts/BehaviourTrees/Strategies.cs
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.AI;
+
+public class PatrolStrategy : IStrategy {
+    private Transform _entity;
+    private NavMeshAgent _agent;
+    private List<Transform> _patrolPoints;
+    private float _patrolSpeed;
+    private int _currentIndex;
+    private bool _isPathCalculated;
+
+    public PatrolStrategy(Transform entity, NavMeshAgent agent, List<Transform> patrolPoints, float patrolSpeed = 2f) {
+        _entity = entity;
+        _agent = agent;
+        _patrolPoints = patrolPoints;
+        _patrolSpeed = patrolSpeed;
+    }
+
+    public TaskStatus Process() {
+        if (_currentIndex == _patrolPoints.Count) return TaskStatus.Success;
+        
+        Transform target = _patrolPoints[_currentIndex];
+        _agent.SetDestination(target.position);
+        _entity.LookAt(new Vector3(target.position.x, _entity.position.y, target.position.z));
+        
+        if (_isPathCalculated && _agent.remainingDistance < 0.1f) {
+            _currentIndex++;
+            _isPathCalculated = false;
+        }
+        
+        if (_agent.pathPending) {
+            _isPathCalculated = true;
+        }
+        
+        return TaskStatus.Running;
+    }
+    
+    public void OnEnter()
+    {
+        // ! Maybe get closest patrolPoint
+        // _agent.speed = _patrolSpeed;
+    }
+
+    public void OnExit()
+    {
+        // _agent.speed = _patrolSpeed;
+    }
+
+    public void Reset() => _currentIndex = 0;
+}

@@ -1,4 +1,4 @@
-// Source https://github.com/vmuijrers/GameDevAI
+// Source https://github.com/vmuijrers/GameDevAI/blob/main/BehaviourTreeExample/Assets/Scripts/AI/Blackboard/Blackboard.cs
 using System.Collections.Generic;
 
 public class Blackboard
