@@ -15,6 +15,8 @@ public class SequenceNode : CompositeNode
                 case TaskStatus.Running: return TaskStatus.Running;
             }
         }
+
+        Reset();
         return TaskStatus.Success;
     }
 

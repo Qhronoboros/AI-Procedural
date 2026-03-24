@@ -1,6 +1,5 @@
 // Source: https://github.com/adammyhre/Unity-Behaviour-Trees/blob/master/Assets/_Project/Scripts/BehaviourTrees/Strategies.cs
 using System.Collections.Generic;
-using Unity.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -27,7 +26,6 @@ public class PatrolStrategy : IStrategy {
         
         if (_isPathCalculated && _agent.remainingDistance < 0.1f) {
             _currentIndex++;
-            Debug.Log(_currentIndex);
 
             if (_currentIndex == _startIndex) return TaskStatus.Success;
 
@@ -35,8 +33,7 @@ public class PatrolStrategy : IStrategy {
                 _currentIndex = 0;
             _isPathCalculated = false;
         }
-        
-        // Problem, pathPending is unreliable when too close to destination
+
         if (_agent.pathPending) {
             _isPathCalculated = true;
         }
@@ -65,7 +62,7 @@ public class PatrolStrategy : IStrategy {
         _currentIndex = _startIndex;
 
         _agent.speed = _patrolSpeed;
-        _isPathCalculated = false;
+        _isPathCalculated = true;
     }
 
     public void Reset() => _currentIndex = 0;
