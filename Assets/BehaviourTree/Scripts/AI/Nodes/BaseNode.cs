@@ -9,6 +9,8 @@ public abstract class BaseNode
         this.name = name;
     }
 
+    public virtual string GetName() => name;
+    
     public virtual void SetupBlackboard(Blackboard blackboard)
     {
         this.blackboard = blackboard;

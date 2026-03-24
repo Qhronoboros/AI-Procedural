@@ -64,6 +64,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1216088995535699275}
   m_SourcePrefab: {fileID: 100100000, guid: bd341193d32b0e147b8389c79409deb7, type: 3}
+--- !u!114 &6142455918258162808 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2012254648607296685, guid: bd341193d32b0e147b8389c79409deb7, type: 3}
+  m_PrefabInstance: {fileID: 5679766921308520661}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
 --- !u!1 &6987419936520146479 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3326709342041788154, guid: bd341193d32b0e147b8389c79409deb7, type: 3}
@@ -81,3 +92,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9fef278fdb52c2438ed49c1098d26e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Guard
+  _patrolPoints: []
+  activeNodeText: {fileID: 6142455918258162808}

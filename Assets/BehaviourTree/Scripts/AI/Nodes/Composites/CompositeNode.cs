@@ -11,6 +11,7 @@ public class CompositeNode : BaseNode
         this.children = children.ToList();
     }
 
+    public override string GetName() => children[currentChild].GetName();
     public void AddChild(BaseNode child) => children.Add(child);
 
     public override void SetupBlackboard(Blackboard blackboard)

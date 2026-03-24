@@ -7,6 +7,7 @@ public class DecoratorNode : BaseNode
         this.child = child;
     }
 
+    public override string GetName() => child.GetName();
     public void SetChild(BaseNode child) => this.child = child;
 
     public override void SetupBlackboard(Blackboard blackboard)

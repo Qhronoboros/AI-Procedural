@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -6,6 +7,7 @@ using UnityEngine.AI;
 public class Guard : MonoBehaviour
 {
     [SerializeField] private List<Transform> _patrolPoints;
+    [SerializeField] private TMP_Text activeNodeText;
 
     private Blackboard _blackboard;
     private CompositeNode _tree;
@@ -22,7 +24,7 @@ public class Guard : MonoBehaviour
 
         _tree = new SequenceNode("Tree");
 
-        // _tree.AddChild(new TaskNode("CheckDistance", new ConditionStrategy(() => Vector3.Distance(_blackboard.GetVariable<Vector3>(VariableNames.PLAYER_POSITION), transform.position) < 5.0f)));
+        _tree.AddChild(new TaskNode("CheckDistance", new ConditionStrategy(() => Vector3.Distance(_blackboard.GetVariable<Vector3>(VariableNames.PLAYER_POSITION), transform.position) < 5.0f)));
         _tree.AddChild(new TaskNode("Patrol", new PatrolStrategy(transform, _agent, _patrolPoints, 8.0f)));
 
         _tree.SetupBlackboard(_blackboard);
@@ -38,5 +40,7 @@ public class Guard : MonoBehaviour
             // case TaskStatus.Failed: Debug.Log("Failed"); break;
             // case TaskStatus.Running: Debug.Log("Running"); break;
         }
+        
+        activeNodeText.text = _tree.GetName();
     }
 }
